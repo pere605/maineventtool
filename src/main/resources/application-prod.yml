@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5431/eventtool
-    username: eventtool
-    password: eventtool
+    url: jdbc:postgres://wrbpwrgletdmcq:d0a90f8952c034ed49fa15cb75786349520b6dec30c5196f759bf3a2eafa59f9@ec2-23-21-122-141.compute-1.amazonaws.com:5432/d5v4elqjq4nb6l
+    username: wrbpwrgletdmcq
+    password: d0a90f8952c034ed49fa15cb75786349520b6dec30c5196f759bf3a2eafa59f9
     driver-class-name: org.postgresql.Driver
   jpa:
     generate-ddl: false
