@@ -5,7 +5,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -18,8 +18,8 @@ public class SeasonalEvent {
     private String name;
     private String type;
     private String subType;
-    private LocalDateTime startingTime;
-    private LocalDateTime endingTime;
+    private Date startingTime;
+    private Date endingTime;
 
     public SeasonalEvent() {}
 
@@ -29,8 +29,8 @@ public class SeasonalEvent {
         String name,
         String type,
         String subType,
-        LocalDateTime startingTime,
-        LocalDateTime endingTime
+        Date startingTime,
+        Date endingTime
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -61,11 +61,11 @@ public class SeasonalEvent {
         return subType;
     }
 
-    public LocalDateTime getStartingTime() {
+    public Date getStartingTime() {
         return startingTime;
     }
 
-    public LocalDateTime getEndingTime() {
+    public Date getEndingTime() {
         return endingTime;
     }
 }
