@@ -5,6 +5,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -49,23 +50,47 @@ public class SeasonalEvent {
         return eventId;
     }
 
+    public void setEventId(Integer eventId) {
+        this.eventId = eventId;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getType() {
         return type;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getSubType() {
         return subType;
     }
 
-    public Date getStartingTime() {
-        return startingTime;
+    public void setSubType(String subType) {
+        this.subType = subType;
     }
 
-    public Date getEndingTime() {
-        return endingTime;
+    public String getStartingTime() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(startingTime);
+    }
+
+    public void setStartingTime(Date startingTime) {
+        this.startingTime = startingTime;
+    }
+
+    public String getEndingTime() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(endingTime);
+    }
+
+    public void setEndingTime(Date endingTime) {
+        this.endingTime = endingTime;
     }
 }

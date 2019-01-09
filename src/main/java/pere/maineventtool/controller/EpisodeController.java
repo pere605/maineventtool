@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,6 +27,7 @@ import javax.validation.Valid;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -76,6 +78,30 @@ public class EpisodeController {
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.notFound().build();
         }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{episodeId}")
+    public ResponseEntity updateEpisode(
+        @PathVariable UUID episodeId,
+        @Valid @RequestBody pere.maineventtool.domain.seasonalevent.dto.Episode dto
+    ) {
+        Optional<Episode> episodeData = repository.findById(episodeId);
+
+        if (!episodeData.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Episode episode = episodeData.get();
+
+        episode.setNumber(Integer.parseInt(dto.getNumber()));
+        episode.setRewardType(dto.getRewardType());
+        episode.setRewardSubType(dto.getRewardSubType());
+        episode.setRewardAmount(Integer.parseInt(dto.getRewardAmount()));
+        episode.setChestId(dto.getChestId());
+
+        repository.save(episode);
 
         return ResponseEntity.ok().build();
     }

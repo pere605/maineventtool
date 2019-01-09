@@ -41,27 +41,47 @@ public class Episode {
         return id;
     }
 
+    public UUID getSeasonalEventId() {
+        return seasonalEventId;
+    }
+
     public Integer getNumber() {
         return number;
     }
 
-    public UUID getSeasonalEventId() {
-        return seasonalEventId;
+    public void setNumber(Integer number) {
+        this.number = number;
     }
 
     public String getRewardType() {
         return rewardType;
     }
 
+    public void setRewardType(String rewardType) {
+        this.rewardType = rewardType;
+    }
+
     public String getRewardSubType() {
         return rewardSubType;
+    }
+
+    public void setRewardSubType(String rewardSubType) {
+        this.rewardSubType = rewardSubType;
     }
 
     public Integer getRewardAmount() {
         return rewardAmount;
     }
 
+    public void setRewardAmount(Integer rewardAmount) {
+        this.rewardAmount = rewardAmount;
+    }
+
     public String getChestId() {
         return chestId;
+    }
+
+    public void setChestId(String chestId) {
+        this.chestId = chestId;
     }
 }

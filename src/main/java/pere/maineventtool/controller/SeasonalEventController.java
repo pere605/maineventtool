@@ -3,16 +3,18 @@ package pere.maineventtool.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
-import pere.maineventtool.domain.seasonalevent.dto.CreateSeasonalEventRequest;
+import pere.maineventtool.domain.seasonalevent.dto.SeasonalEventRequest;
 import pere.maineventtool.domain.seasonalevent.model.SeasonalEvent;
 import pere.maineventtool.domain.seasonalevent.repository.SeasonalEventRepository;
 import pere.maineventtool.domain.seasonalevent.xml.XmlImporter;
@@ -54,7 +56,7 @@ public class SeasonalEventController {
 
     @PostMapping
     public ResponseEntity createEvent(
-        @Valid @RequestBody CreateSeasonalEventRequest dto,
+        @Valid @RequestBody SeasonalEventRequest dto,
         BindingResult validationResult
     ) {
         if (validationResult.hasErrors()) {
@@ -69,18 +71,45 @@ public class SeasonalEventController {
                     dto.name,
                     dto.type,
                     dto.subType,
-                    new SimpleDateFormat().parse(dto.startingTime),
-                    new SimpleDateFormat().parse(dto.endingTime)
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dto.startingTime),
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dto.endingTime)
             );
 
             repository.save(seasonalEvent);
         } catch (ParseException e) {
             System.out.println("Problem parsing dates");
+
+            return ResponseEntity.badRequest().body(String.format("Invalid date: %s", e.getMessage()));
         }
 
         return ResponseEntity.created(
             UriComponentsBuilder.fromPath("/seasonal_events/{id}").build(id.toString())
         ).build();
+    }
+
+    @PutMapping("/{seasonalEventId}")
+    public ResponseEntity updateEvent(
+        @PathVariable UUID seasonalEventId,
+        @Valid @RequestBody SeasonalEventRequest dto
+    ) throws ParseException {
+        Optional<SeasonalEvent> seasonalEventData = repository.findById(seasonalEventId);
+
+        if (!seasonalEventData.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        SeasonalEvent seasonalEvent = seasonalEventData.get();
+
+        seasonalEvent.setEventId(Integer.parseInt(dto.eventId));
+        seasonalEvent.setName(dto.name);
+        seasonalEvent.setType(dto.type);
+        seasonalEvent.setSubType(dto.subType);
+        seasonalEvent.setStartingTime(new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dto.startingTime));
+        seasonalEvent.setEndingTime(new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dto.endingTime));
+
+        repository.save(seasonalEvent);
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/import")

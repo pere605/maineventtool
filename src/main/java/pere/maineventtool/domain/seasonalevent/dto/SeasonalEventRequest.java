@@ -2,7 +2,7 @@ package pere.maineventtool.domain.seasonalevent.dto;
 
 import javax.validation.constraints.NotBlank;
 
-public class CreateSeasonalEventRequest {
+public class SeasonalEventRequest {
     @NotBlank
     public String eventId;
     @NotBlank
