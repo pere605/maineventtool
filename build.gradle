@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.1.1.RELEASE'
+        springBootVersion = '2.1.2.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -17,7 +17,7 @@ apply plugin: 'io.spring.dependency-management'
 
 group = 'pere'
 version = '0.0.1'
-sourceCompatibility = 1.8
+sourceCompatibility = 11
 
 repositories {
     mavenCentral()
@@ -27,6 +27,9 @@ repositories {
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     implementation('org.springframework.boot:spring-boot-starter-web')
+    compile('javax.xml.bind:jaxb-api')
+    compile('com.sun.xml.bind:jaxb-core:2.3.0')
+    compile('com.sun.xml.bind:jaxb-impl:2.3.2')
     runtimeOnly('org.postgresql:postgresql')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 }

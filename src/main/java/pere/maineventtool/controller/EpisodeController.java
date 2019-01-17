@@ -16,11 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import pere.maineventtool.domain.seasonalevent.dto.AddEpisodesRequest;
+import pere.maineventtool.domain.seasonalevent.mapper.EpisodeMapper;
 import pere.maineventtool.domain.seasonalevent.model.Episode;
 import pere.maineventtool.domain.seasonalevent.repository.EpisodeRepository;
 import pere.maineventtool.domain.seasonalevent.xml.EpisodeXml;
 import pere.maineventtool.domain.seasonalevent.xml.EpisodesXml;
-import pere.maineventtool.domain.seasonalevent.xml.XmlImporter;
+import pere.maineventtool.shared.XmlImporter;
 import pere.maineventtool.domain.shared.validation.ValidationService;
 
 import javax.validation.Valid;
@@ -33,8 +34,14 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/episode")
 public class EpisodeController {
+    private final EpisodeRepository repository;
+    private final EpisodeMapper mapper;
+
     @Autowired
-    private EpisodeRepository repository;
+    public EpisodeController(EpisodeRepository repository, EpisodeMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
 
     @GetMapping("/{seasonalEventId}")
     public ResponseEntity getEpisodes(@PathVariable UUID seasonalEventId) {
@@ -51,23 +58,10 @@ public class EpisodeController {
             return ResponseEntity.badRequest().body(ValidationService.parseResult(validationResult).getErrors());
         }
 
-        UUID id = UUID.randomUUID();
-        for (pere.maineventtool.domain.seasonalevent.dto.Episode episodeDTO : dto.getEpisodes()) {
-            repository.save(
-                new Episode(
-                    id,
-                    Integer.parseInt(episodeDTO.getNumber()),
-                    seasonalEventId,
-                    episodeDTO.getRewardType(),
-                    episodeDTO.getRewardSubType(),
-                    Integer.parseInt(episodeDTO.getRewardAmount()),
-                    episodeDTO.getChestId()
-                )
-            );
-        }
+        repository.saveAll(this.mapper.map(dto, seasonalEventId));
 
         return ResponseEntity.created(
-                UriComponentsBuilder.fromPath("/seasonal_events/{id}").build(id.toString())
+                UriComponentsBuilder.fromPath("/episode/{seasonalEventId}").build(seasonalEventId.toString())
         ).build();
     }
 
@@ -111,9 +105,11 @@ public class EpisodeController {
         @PathVariable UUID seasonalEventId,
         @RequestParam("file") MultipartFile file
     ) throws IOException, JAXBException {
-        EpisodesXml data = (EpisodesXml) XmlImporter.importFromInputStream(file.getInputStream(), EpisodesXml.class);
+        XmlImporter<EpisodesXml> importer = new XmlImporter();
+        EpisodesXml xml = importer.importFromInputStream(file.getInputStream(), EpisodesXml.class);
+
         ArrayList<Episode> episodes = new ArrayList<>();
-        for (EpisodeXml element : data.rewards) {
+        for (EpisodeXml element : xml.rewards) {
             UUID id = UUID.randomUUID();
             episodes.add(
                 new Episode(
@@ -130,7 +126,7 @@ public class EpisodeController {
 
         repository.saveAll(episodes);
 
-        System.out.println(String.format("Imported %d episodes.", data.rewards.size()));
+        System.out.println(String.format("Imported %d episodes.", xml.rewards.size()));
 
         return ResponseEntity.created(
                 UriComponentsBuilder.fromPath("/episodes").build().toUri()

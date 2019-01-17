@@ -1,11 +1,12 @@
 package pere.maineventtool.domain.seasonalevent.model;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import org.hibernate.annotations.Type;
+import pere.maineventtool.shared.DateTool;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -78,16 +79,26 @@ public class SeasonalEvent {
         this.subType = subType;
     }
 
-    public String getStartingTime() {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(startingTime);
+    public Date getStartingTime() {
+        return startingTime;
+    }
+
+    @JsonGetter("startingTime")
+    public String getParsedStartingTime() {
+        return DateTool.parseDate(this.startingTime, "yyyy-MM-dd HH:mm:ss");
     }
 
     public void setStartingTime(Date startingTime) {
         this.startingTime = startingTime;
     }
 
-    public String getEndingTime() {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(endingTime);
+    public Date getEndingTime() {
+        return endingTime;
+    }
+
+    @JsonGetter("endingTime")
+    public String getParsedEndingTime() {
+        return DateTool.parseDate(this.endingTime, "yyyy-MM-dd HH:mm:ss");
     }
 
     public void setEndingTime(Date endingTime) {

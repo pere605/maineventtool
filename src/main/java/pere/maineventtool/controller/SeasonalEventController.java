@@ -1,9 +1,9 @@
 package pere.maineventtool.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,28 +15,36 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import pere.maineventtool.domain.seasonalevent.dto.SeasonalEventRequest;
+import pere.maineventtool.domain.seasonalevent.mapper.SeasonalEventMapper;
 import pere.maineventtool.domain.seasonalevent.model.SeasonalEvent;
 import pere.maineventtool.domain.seasonalevent.repository.SeasonalEventRepository;
-import pere.maineventtool.domain.seasonalevent.xml.XmlImporter;
+import pere.maineventtool.shared.XmlImporter;
 import pere.maineventtool.domain.shared.validation.ValidationService;
 import pere.maineventtool.domain.seasonalevent.xml.SeasonalEventXml;
 import pere.maineventtool.domain.seasonalevent.xml.SeasonalEventsXml;
-import pere.maineventtool.util.DateTool;
+import pere.maineventtool.shared.DateTool;
 
 import javax.validation.Valid;
 import javax.xml.bind.JAXBException;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/seasonal_event")
 public class SeasonalEventController {
+    private final SeasonalEventRepository repository;
+    private final SeasonalEventMapper mapper;
+
     @Autowired
-    private SeasonalEventRepository repository;
+    public SeasonalEventController(SeasonalEventRepository repository, SeasonalEventMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
 
     @GetMapping
     public ResponseEntity getEvents() {
@@ -63,27 +71,12 @@ public class SeasonalEventController {
             return ResponseEntity.badRequest().body(ValidationService.parseResult(validationResult).getErrors());
         }
 
-        UUID id = UUID.randomUUID();
-        try {
-            SeasonalEvent seasonalEvent = new SeasonalEvent(
-                    id,
-                    Integer.parseInt(dto.eventId),
-                    dto.name,
-                    dto.type,
-                    dto.subType,
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dto.startingTime),
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dto.endingTime)
-            );
+        SeasonalEvent seasonalEvent = this.mapper.map(dto);
 
-            repository.save(seasonalEvent);
-        } catch (ParseException e) {
-            System.out.println("Problem parsing dates");
-
-            return ResponseEntity.badRequest().body(String.format("Invalid date: %s", e.getMessage()));
-        }
+        repository.save(seasonalEvent);
 
         return ResponseEntity.created(
-            UriComponentsBuilder.fromPath("/seasonal_events/{id}").build(id.toString())
+            UriComponentsBuilder.fromPath("/seasonal_events/{id}").build(seasonalEvent.getId().toString())
         ).build();
     }
 
@@ -91,7 +84,7 @@ public class SeasonalEventController {
     public ResponseEntity updateEvent(
         @PathVariable UUID seasonalEventId,
         @Valid @RequestBody SeasonalEventRequest dto
-    ) throws ParseException {
+    ) {
         Optional<SeasonalEvent> seasonalEventData = repository.findById(seasonalEventId);
 
         if (!seasonalEventData.isPresent()) {
@@ -100,40 +93,65 @@ public class SeasonalEventController {
 
         SeasonalEvent seasonalEvent = seasonalEventData.get();
 
-        seasonalEvent.setEventId(Integer.parseInt(dto.eventId));
-        seasonalEvent.setName(dto.name);
-        seasonalEvent.setType(dto.type);
-        seasonalEvent.setSubType(dto.subType);
-        seasonalEvent.setStartingTime(new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dto.startingTime));
-        seasonalEvent.setEndingTime(new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dto.endingTime));
-
-        repository.save(seasonalEvent);
+        repository.save(this.mapper.map(dto, seasonalEvent));
 
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/import")
     public ResponseEntity importEvents(@RequestParam("file") MultipartFile file) throws IOException, JAXBException {
-        SeasonalEventsXml data = (SeasonalEventsXml) XmlImporter.importFromInputStream(file.getInputStream(), SeasonalEventsXml.class);
+        SeasonalEventsXml data = new SeasonalEventsXml();
+        XmlImporter<SeasonalEventsXml> importer = new XmlImporter(data);
+        SeasonalEventsXml xml = importer.importFromInputStream(file.getInputStream(), SeasonalEventsXml.class);
+
         ArrayList<SeasonalEvent> events = new ArrayList<>();
-        for (SeasonalEventXml element : data.events) {
+        for (SeasonalEventXml element : xml.events) {
+            System.out.println(element.id);
             events.add(new SeasonalEvent(
                     UUID.randomUUID(),
                     Integer.parseInt(element.id),
                     element.name,
                     element.type,
                     element.subType,
-                    DateTool.parseStringDate(element.start),
-                    DateTool.parseStringDate(element.end)
+                    DateTool.parseStringDate(element.start, "yyyy-MM-dd HH:mm:ss"),
+                    DateTool.parseStringDate(element.end, "yyyy-MM-dd HH:mm:ss")
             ));
         }
 
         repository.saveAll(events);
 
-        System.out.println(String.format("Imported %d events.", data.events.size()));
+        System.out.println(String.format("Imported %d events.", xml.events.size()));
 
         return ResponseEntity.created(
             UriComponentsBuilder.fromPath("/seasonal_events").build().toUri()
         ).build();
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity exportEvents() throws JAXBException {
+        List<SeasonalEventXml> eventsData = repository.findAll().stream()
+                .map(event -> {
+                    SeasonalEventXml element = new SeasonalEventXml();
+                    element.id = event.getEventId().toString();
+                    element.type = event.getType();
+                    element.subType = event.getSubType();
+                    element.name = event.getName();
+                    element.start = DateTool.parseDate(event.getStartingTime(), "yyyy-MM-dd'T'HH:mm:ss'+00:00'");
+                    element.end = DateTool.parseDate(event.getEndingTime(), "yyyy-MM-dd'T'HH:mm:ss'+00:00'");
+
+                    return element;
+                })
+                .collect(Collectors.toList());
+
+        SeasonalEventsXml xml = new SeasonalEventsXml();
+        xml.events = eventsData;
+
+        XmlImporter<SeasonalEventsXml> importer = new XmlImporter(xml);
+        ByteArrayOutputStream output = importer.exportToFile();
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"text.xml\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(output.toByteArray());
     }
 }

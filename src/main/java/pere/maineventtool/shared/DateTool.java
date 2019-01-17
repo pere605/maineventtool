@@ -1,12 +1,12 @@
-package pere.maineventtool.util;
+package pere.maineventtool.shared;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DateTool {
-    public static Date parseStringDate(String date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static Date parseStringDate(String date, String format) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
 
         try {
             return dateFormat.parse(date.replace('T', ' ').replace("+00:00", ""));
@@ -15,5 +15,11 @@ public class DateTool {
 
             return new Date();
         }
+    }
+
+    public static String parseDate(Date date, String format) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+
+        return dateFormat.format(date);
     }
 }
