@@ -1,7 +1,14 @@
 package pere.maineventtool.domain.seasonalevent.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.validation.constraints.NotBlank;
 
+@NoArgsConstructor
+@Getter
+@Setter
 public class Episode {
     @NotBlank
     private String number;
@@ -13,44 +20,4 @@ public class Episode {
     private String rewardAmount;
     @NotBlank
     private String chestId;
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getRewardType() {
-        return rewardType;
-    }
-
-    public void setRewardType(String rewardType) {
-        this.rewardType = rewardType;
-    }
-
-    public String getRewardSubType() {
-        return rewardSubType;
-    }
-
-    public void setRewardSubType(String rewardSubType) {
-        this.rewardSubType = rewardSubType;
-    }
-
-    public String getRewardAmount() {
-        return rewardAmount;
-    }
-
-    public void setRewardAmount(String rewardAmount) {
-        this.rewardAmount = rewardAmount;
-    }
-
-    public String getChestId() {
-        return chestId;
-    }
-
-    public void setChestId(String chestId) {
-        this.chestId = chestId;
-    }
 }

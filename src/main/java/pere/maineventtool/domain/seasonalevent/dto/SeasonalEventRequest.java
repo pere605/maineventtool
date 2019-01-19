@@ -1,18 +1,25 @@
 package pere.maineventtool.domain.seasonalevent.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.validation.constraints.NotBlank;
 
+@NoArgsConstructor
+@Getter
+@Setter
 public class SeasonalEventRequest {
     @NotBlank
-    public String eventId;
+    private String eventId;
     @NotBlank
-    public String name;
+    private String name;
     @NotBlank
-    public String type;
+    private String type;
     @NotBlank
-    public String subType;
+    private String subType;
     @NotBlank
-    public String startingTime;
+    private String startingTime;
     @NotBlank
-    public String endingTime;
+    private String endingTime;
 }

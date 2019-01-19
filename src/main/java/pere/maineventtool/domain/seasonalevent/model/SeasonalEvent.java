@@ -1,6 +1,10 @@
 package pere.maineventtool.domain.seasonalevent.model;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import pere.maineventtool.shared.DateTool;
 
@@ -12,6 +16,9 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "seasonal_events")
+@NoArgsConstructor
+@Getter
+@Setter
 public class SeasonalEvent {
     @Id
     @Type(type = "pg-uuid")
@@ -23,16 +30,14 @@ public class SeasonalEvent {
     private Date startingTime;
     private Date endingTime;
 
-    public SeasonalEvent() {}
-
     public SeasonalEvent(
-        UUID id,
-        Integer eventId,
-        String name,
-        String type,
-        String subType,
-        Date startingTime,
-        Date endingTime
+            UUID id,
+            Integer eventId,
+            String name,
+            String type,
+            String subType,
+            Date startingTime,
+            Date endingTime
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -43,65 +48,13 @@ public class SeasonalEvent {
         this.endingTime = endingTime;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Integer getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(Integer eventId) {
-        this.eventId = eventId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getSubType() {
-        return subType;
-    }
-
-    public void setSubType(String subType) {
-        this.subType = subType;
-    }
-
-    public Date getStartingTime() {
-        return startingTime;
-    }
-
     @JsonGetter("startingTime")
     public String getParsedStartingTime() {
         return DateTool.parseDate(this.startingTime, "yyyy-MM-dd HH:mm:ss");
     }
 
-    public void setStartingTime(Date startingTime) {
-        this.startingTime = startingTime;
-    }
-
-    public Date getEndingTime() {
-        return endingTime;
-    }
-
     @JsonGetter("endingTime")
     public String getParsedEndingTime() {
         return DateTool.parseDate(this.endingTime, "yyyy-MM-dd HH:mm:ss");
-    }
-
-    public void setEndingTime(Date endingTime) {
-        this.endingTime = endingTime;
     }
 }

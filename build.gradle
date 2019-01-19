@@ -30,6 +30,8 @@ dependencies {
     compile('javax.xml.bind:jaxb-api')
     compile('com.sun.xml.bind:jaxb-core:2.3.0')
     compile('com.sun.xml.bind:jaxb-impl:2.3.2')
+    compile('org.projectlombok:lombok:1.18.4')
     runtimeOnly('org.postgresql:postgresql')
+    implementation('org.junit.jupiter:junit-jupiter-engine')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
