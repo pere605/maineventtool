@@ -105,7 +105,7 @@ public class EpisodeController {
         @PathVariable UUID seasonalEventId,
         @RequestParam("file") MultipartFile file
     ) throws IOException, JAXBException {
-        XmlImporter<EpisodesXml> importer = new XmlImporter();
+        XmlImporter<EpisodesXml> importer = new XmlImporter<>();
         EpisodesXml xml = importer.importFromInputStream(file.getInputStream(), EpisodesXml.class);
 
         ArrayList<Episode> episodes = new ArrayList<>();

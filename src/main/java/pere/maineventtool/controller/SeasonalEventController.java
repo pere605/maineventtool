@@ -101,7 +101,7 @@ public class SeasonalEventController {
     @PostMapping("/import")
     public ResponseEntity importEvents(@RequestParam("file") MultipartFile file) throws IOException, JAXBException {
         SeasonalEventsXml data = new SeasonalEventsXml();
-        XmlImporter<SeasonalEventsXml> importer = new XmlImporter(data);
+        XmlImporter<SeasonalEventsXml> importer = new XmlImporter<>(data);
         SeasonalEventsXml xml = importer.importFromInputStream(file.getInputStream(), SeasonalEventsXml.class);
 
         ArrayList<SeasonalEvent> events = new ArrayList<>();
@@ -146,7 +146,7 @@ public class SeasonalEventController {
         SeasonalEventsXml xml = new SeasonalEventsXml();
         xml.events = eventsData;
 
-        XmlImporter<SeasonalEventsXml> importer = new XmlImporter(xml);
+        XmlImporter<SeasonalEventsXml> importer = new XmlImporter<>(xml);
         ByteArrayOutputStream output = importer.exportToFile();
 
         return ResponseEntity.ok()
