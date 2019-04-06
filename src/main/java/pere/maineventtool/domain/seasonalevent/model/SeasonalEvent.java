@@ -3,7 +3,6 @@ package pere.maineventtool.domain.seasonalevent.model;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 import pere.maineventtool.shared.DateTool;
