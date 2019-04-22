@@ -64,4 +64,23 @@ public class SeasonalEventControllerTests {
                 .andExpect(jsonPath("$.type", is("Type")))
                 .andExpect(jsonPath("$.subType", is("SubType")));
     }
+
+    @Test
+    public void testDeleteSeasonalEvent() throws Exception {
+        UUID id = UUID.randomUUID();
+        SeasonalEvent seasonalEvent = new SeasonalEvent(
+                id,
+                1,
+                "Name",
+                "Type",
+                "SubType",
+                Date.from(Instant.now()),
+                Date.from(Instant.now())
+        );
+
+        given(repository.findById(id)).willReturn(Optional.of(seasonalEvent));
+        this.mvc
+                .perform(delete("/seasonal_event/" + id.toString()))
+                .andExpect(status().isNoContent());
+    }
 }
