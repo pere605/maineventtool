@@ -11,13 +11,15 @@ import org.springframework.web.multipart.MultipartFile;
 import pere.maineventtool.domain.seasonalevent.xml.SeasonalEventXml;
 import pere.maineventtool.domain.seasonalevent.xml.SeasonalEventsXml;
 
+import javax.xml.bind.JAXBException;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 public class XmlImporterTests {
     @Test
     @SneakyThrows
-    public void testImport() {
+    public void testImport() throws IOException, JAXBException {
         XmlImporter xmlImporter = new XmlImporter();
         byte[] data = ("<events>" +
                 "<event>" +
@@ -50,7 +52,7 @@ public class XmlImporterTests {
 
     @Test
     @SneakyThrows
-    public void testExport() {
+    public void testExport() throws JAXBException {
         SeasonalEventsXml xml = new SeasonalEventsXml();
         SeasonalEventXml element = new SeasonalEventXml();
         element.id = "1";
