@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  maineventtool-app:
+    build:
+      context: .
+      dockerfile: .docker/app/Dockerfile
+    image: maineventtool-app
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://maineventtool-db:5432/eventtool?user=eventtool&password=eventtool
+    depends_on:
+      - maineventtool-db
+  maineventtool-db:
+    build:
+      context: .
+      dockerfile: .docker/db/Dockerfile
+    environment:
+      - POSTGRES_USER=eventtool
+      - POSTGRES_PASSWORD=eventtool

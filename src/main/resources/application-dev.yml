@@ -1,7 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5431/eventtool
-    username: eventtool
-    password: eventtool
+    url: jdbc:${DATABASE_URL}
   jpa:
     show-sql: true
+  flyway:
+    user: eventtool
+    password: eventtool
