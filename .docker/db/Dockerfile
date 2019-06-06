@@ -1,2 +1,2 @@
-FROM postgres:11
+FROM postgres:10
 COPY ./.docker/db/init.sql /docker-entrypoint-initdb.d/
