@@ -5,11 +5,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import pere.maineventtool.domain.seasonalevent.mapper.EpisodeMapper;
 import pere.maineventtool.domain.seasonalevent.model.Episode;
 import pere.maineventtool.domain.seasonalevent.repository.EpisodeRepository;
+import pere.maineventtool.security.UserDetailsServiceImpl;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,12 +28,16 @@ public class EpisodeControllerTest {
     private MockMvc mvc;
 
     @MockBean
+    private UserDetailsServiceImpl userDetailsService;
+
+    @MockBean
     private EpisodeRepository repository;
 
     @MockBean
     private EpisodeMapper mapper;
 
     @Test
+    @WithMockUser
     public void testGetEpisodeList() throws Exception{
         UUID id = UUID.randomUUID();
         List<Episode> episodes = List.of();

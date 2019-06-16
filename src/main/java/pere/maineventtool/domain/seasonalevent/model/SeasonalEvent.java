@@ -20,7 +20,6 @@ import java.util.UUID;
 @Setter
 public class SeasonalEvent {
     @Id
-    @Type(type = "pg-uuid")
     private UUID id;
     private Integer eventId;
     private String name;

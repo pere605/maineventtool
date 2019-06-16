@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -15,6 +16,7 @@ import static org.hamcrest.Matchers.*;
 import pere.maineventtool.domain.seasonalevent.mapper.SeasonalEventMapper;
 import pere.maineventtool.domain.seasonalevent.model.SeasonalEvent;
 import pere.maineventtool.domain.seasonalevent.repository.SeasonalEventRepository;
+import pere.maineventtool.security.UserDetailsServiceImpl;
 
 import java.time.Instant;
 import java.util.Date;
@@ -28,12 +30,16 @@ public class SeasonalEventControllerTests {
     private MockMvc mvc;
 
     @MockBean
+    private UserDetailsServiceImpl userDetailsService;
+
+    @MockBean
     private SeasonalEventRepository repository;
 
     @MockBean
     private SeasonalEventMapper mapper;
 
     @Test
+    @WithMockUser
     public void testGetSeasonalEventList() throws Exception {
         this.mvc
             .perform(get("/seasonal_event"))
@@ -42,6 +48,7 @@ public class SeasonalEventControllerTests {
     }
 
     @Test
+    @WithMockUser
     public void testGetSeasonalEvent() throws Exception {
         UUID id = UUID.randomUUID();
         SeasonalEvent seasonalEvent = new SeasonalEvent(
@@ -66,6 +73,7 @@ public class SeasonalEventControllerTests {
     }
 
     @Test
+    @WithMockUser
     public void testDeleteSeasonalEvent() throws Exception {
         UUID id = UUID.randomUUID();
         SeasonalEvent seasonalEvent = new SeasonalEvent(
